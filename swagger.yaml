@@ -1,0 +1,1805 @@
+openapi: 3.0.3
+info:
+  version: 1.0.1
+  title: MediRecord API  
+  description: |-
+    It will be a parsonal medical application, This app targeted for every person of the society either diseased or not. The Primary function of this app is to track and maintain a persons all medical and this related data. This application should be able to contain a persons general information, physical health status, data of each time met with consultant including consultants info, medical tests and Their results,  medication and routine tests information. There should be all the advises of the consultants.
+
+servers: 
+  - description: Local server
+    url: "http://localhost:8000"
+tags: 
+ - name: Auth
+   description: All auth related end point will be here
+ - name: User
+   description: All user related end point will be here
+ - name: Consultant_visit
+   description: All Consultant_visit related end point will be here
+ - name: General Condition
+   description: All General Condition related end point will be here
+ - name: Lab Test
+   description: All Lab Test related end point will be here
+ - name: Prescription
+   description: All Prescription related end point will be here
+ - name: Medicine
+   description: All Medicine related end point will be here
+paths:
+  "/auth/signup":
+    post:
+      description: create a new account
+      tags: [Auth]
+      requestBody:
+        content:
+          "application/json":
+              schema:
+                type: object
+                properties: 
+                  name:
+                    type: string
+                    example: sadi
+                  email:
+                    type: string
+                    format: email
+                    example: abd@gamil.com
+                  dateofbirth:
+                    type: string
+                    format: date
+                    example: 2/3/43
+                  password: 
+                    type: string
+                    format: password
+                    example: pass123
+                  type:
+                    type: string
+                    enum: [patient, consultant]
+                    example: patient
+                required: [name, email,dateofbirth,type, password]
+      responses:
+        "201":
+            description: Signup successful
+            content:
+              "application/json":
+                schema:
+                  type: object
+                  properties:
+                    code:
+                      type: integer
+                      format: int32
+                      example: 201
+                    message:
+                      type: string
+                      example: Signup successful
+                    data:
+                      type: object
+                      properties:
+                        access_token:
+                          type: string
+                          example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                    links:
+                      type: object
+                      properties:
+                        self:
+                          type: string
+                          example: "/auth/signup"
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          $ref: "#/components/responses/500"
+  "/auth/login":
+    post:
+      description: Login to your account
+      tags: [Auth]
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  format: email
+                  example: sadi@example.com
+                password:
+                  type: string
+                  format: password
+                  example: Password123
+              required: [email, password]
+      responses:
+        "200":
+          description: Signin successul
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    format: int32
+                    example: 200
+                  message:
+                    type: string
+                    example: Login successful
+                  data:
+                    type: object
+                    properties:
+                      access_token:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"
+                  links:
+                    type: object
+                    properties:
+                      self:
+                        type: string
+                        example: "/auth/login"
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          "$ref": "#/components/responses/500"      
+  "/consultant-visit":
+    get:
+      tags: [Consultant_visit] 
+      description: Get all visits to consultants of a patient"
+      parameters:
+        - in: query
+          name: page
+          description: current page number
+          schema:
+            type: integer
+            format: int32
+            example: 2
+        - in: query
+          name: limit
+          description: maximum items to be returned
+          schema:
+            type: integer
+            format: int32
+            example: 10  
+        - in: query
+          name: search
+          description: Search Item name
+          schema:
+            type: string
+            example: title      
+        - in: query
+          name: searchBy
+          description: Search Item 
+          schema:
+            type: string
+            example: title                      
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/sortTypeParam"
+        - $ref: "#/components/parameters/sortByParam"
+        - $ref: "#/components/parameters/searchParam"
+          name: search
+      responses:
+        "200":
+          description: "Return a List of visits"
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Consultant_visit"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+                  links:
+                    type: object
+                    properties:
+                      self:
+                        type: string
+                        format: url
+                        example: "/consultant-visit?page=2&limit=10"
+                      next:
+                        type: string
+                        format: url
+                        example: "/consultant-visit?page=3&limit=10"
+                      prev:
+                        type: string
+                        format: url
+                        example: "/consultant-visit?page=1&limit=10"
+                        
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          "$ref": "#/components/responses/500"
+    post:
+      operationId: createPost
+      security:
+        - bearerAuth: []
+      tags: [Consultant_visit]
+      description: Create a new visit
+      requestBody:
+        description: To create a new visit user must need to provide valid data
+        content:
+          "application/json":
+            schema:
+              type: object
+              properties:
+                consultant_name:
+                  type: string
+                  example: Sadi
+                consultant:
+                  type: string
+                  example: "6503faf94d38ccba349d4f0e"
+                visit_no:
+                  type: integer
+                  format: int32
+                  example: 1
+                date:
+                  type: string
+                  format: date
+                  example: 2018-03-20
+      responses:
+        "201":
+          description: Successfully created a new visit
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/ConsultantVCreateDTO"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "500":
+          $ref: "#/components/responses/500"    
+  "/consultant-visit/{id}":
+    get:
+      tags: [Consultant_visit] 
+      description: Get a visit to consultants of a patient"
+      parameters: 
+        -  in: path
+           name: id
+           required: true
+           description: User ID
+           schema:
+             type: string
+             example: "65049e66f7926d91e2fcdc50"
+        -  in: query
+           name: expand
+           description: expand Prescription and Medicines
+           schema:
+             type: string
+             example: "prescription, medicine" 
+      responses:
+        "200":
+          description: "Return a visit"
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Consultant_visit"
+                  links:
+                    type: object
+                    properties:
+                      self:
+                        type: string
+                        format: url
+                        example: "/consultant-visit?page=2&limit=10"
+                        
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          "$ref": "#/components/responses/500"  
+    patch:       
+      security:
+        - bearerAuth: []  
+      tags: [Consultant_visit]
+      description: Partially update an Visit 
+      parameters:
+         - in: path
+           name: id
+           required: true
+           description: User ID
+           schema:
+             type: string
+             example: "65049e66f7926d91e2fcdc50"
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              type: object
+              properties:
+                consultant_name:
+                  type: string
+                  example: Sadi
+                consultant_id:
+                  type: integer
+                  format: int32
+                  example: 1
+                visit_number:
+                  type: integer
+                  format: int32
+                  example: 1
+                date:
+                  type: string
+                  format: date
+                  example: 2/3/43
+      responses:
+        "200":
+          description: "Successfully Updated"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/ConsultantVUpdateDTO"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
+        "500":
+          $ref: "#/components/responses/500"
+    delete:
+      security:
+        - bearerAuth: []
+      tags: [Consultant_visit]
+      description: Delete an consultant visit by id
+      parameters:
+         - in: path
+           name: id
+           required: true
+           description: User ID
+           schema:
+             type: string
+             example: "65049e66f7926d91e2fcdc50"
+      responses:
+        "204":
+          description: "Consultant Visit deleted successfully"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
+        "500":
+          $ref: "#/components/responses/500"          
+  "/general-condition":
+    get:
+      tags: [General Condition]
+      description: Get all General Conditions of a patient"
+      parameters: 
+        - in: query
+          name: page
+          description: current page number
+          schema:
+            type: integer
+            format: int32
+            example: 2
+        - in: query
+          name: limit
+          description: maximum items to be returned
+          schema:
+            type: integer
+            format: int32
+            example: 10  
+        - in: query
+          name: search
+          description: Search Item name
+          schema:
+            type: string
+            example: title      
+        - in: query
+          name: searchBy
+          description: Search Item 
+          schema:
+            type: string
+            example: title   
+      responses:
+        "200":
+          description: "Return a List of General Condition"
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/General-Condition"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+                  links:
+                    type: object
+                    properties:
+                      self:
+                        type: string
+                        format: url
+                        example: "/consultant-visit?page=2&limit=10"
+                      next:
+                        type: string
+                        format: url
+                        example: "/consultant-visit?page=3&limit=10"
+                      prev:
+                        type: string
+                        format: url
+                        example: "/consultant-visit?page=1&limit=10"
+                        
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          "$ref": "#/components/responses/500"
+    post:
+      operationId: createPostt
+      security:
+        - bearerAuth: []
+      tags: [General Condition]
+      description: Create a new visit
+      requestBody:
+        description: To create a new visit user must need to provide valid data
+        content:
+          "application/json":
+            schema:
+              type: object
+              properties:
+                sign_symptom:
+                  type: string
+                  example: fever
+                consultant_visit_id:
+                  type: string 
+                  example: "65049e66f7926d91e2fcdc50"
+                BP:
+                  type: string
+                  example: "80-90"
+                pulse:
+                  type: integer
+                  format: int32
+                  example: 62
+                weight:
+                  type: integer
+                  format: int32
+                  example: 62
+                age:
+                  type: integer
+                  format: int32
+                  example: 32  
+                body_condition:
+                  type: string
+                  example: bad  
+              required: [consultant_visit_id,BP,pulse,weight,age,body_condition]
+      responses:
+        "201":
+          description: Successfully created a new General Condition
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/GeneralCreateDTO"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "500":
+          $ref: "#/components/responses/500"    
+  "/general-condition/{id}":
+    get:
+      tags: [General Condition]
+      description: Get a General Condition of a patient"
+      parameters:
+        -  in: path
+           name: id
+           required: true
+           description: User ID
+           schema:
+             type: string
+             example: "65049e66f7926d91e2fcdc50"
+        - in: query
+          name: expand
+          description: expand Prescription and Medicines
+          schema:
+            type: string
+            example: "prescription, medicine" 
+      responses:
+        "200":
+          description: "Return a condition"
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/General-Condition"
+                  links:
+                    type: object
+                    properties:
+                      self:
+                        type: string
+                        format: url
+                        example: "/general-condition/1"
+                        
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          "$ref": "#/components/responses/500"    
+    patch:       
+      security:
+        - bearerAuth: []  
+      tags: [General Condition]
+      description: Partially update an Condition
+      parameters:
+        -  in: path
+           name: id
+           required: true
+           description: User ID
+           schema:
+             type: string
+             example: "65049e66f7926d91e2fcdc50"
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              type: object
+              properties:
+                sign_symptom:
+                  type: string
+                  example: fever
+                consultant_visit_id:
+                  type: integer
+                  format: int32
+                  example: 1
+                BP:
+                  type: integer
+                  format: int32
+                  example: 80-90
+                pulse:
+                  type: integer
+                  format: int32
+                  example: 62
+                weight:
+                  type: integer
+                  format: int32
+                  example: 62
+                age:
+                  type: integer
+                  format: int32
+                  example: 32  
+                body_condition:
+                  type: string
+                  example: bad  
+      responses:
+        "200":
+          description: "Successfully Updated"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/GeneralUpdateDTO"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
+        "500":
+          $ref: "#/components/responses/500"
+    delete:
+      security:
+        - bearerAuth: []
+      tags: [General Condition]
+      description: Delete a Condition by id
+      parameters:
+        -  in: path
+           name: id
+           required: true
+           description: User ID
+           schema:
+             type: string
+             example: "65049e66f7926d91e2fcdc50"
+      responses:
+        "204":
+          description: "Condition deleted successfully"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
+        "500":
+          $ref: "#/components/responses/500"                    
+  "/lab-test":
+    get:
+      tags: [Lab Test]
+      description: Get all Lab test of a patient"
+      parameters: 
+        - in: query
+          name: page
+          description: current page number
+          schema:
+            type: integer
+            format: int32
+            example: 2
+        - in: query
+          name: limit
+          description: maximum items to be returned
+          schema:
+            type: integer
+            format: int32
+            example: 10  
+        - in: query
+          name: search
+          description: Search Item name
+          schema:
+            type: string
+            example: title      
+        - in: query
+          name: searchBy
+          description: Search Item 
+          schema:
+            type: string
+            example: title   
+      responses:
+        "200":
+          description: "Return a List of Lab Test"
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Lab_Test"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+                  links:
+                    type: object
+                    properties:
+                      self:
+                        type: string
+                        format: url
+                        example: "/lab-test?page=2&limit=10"
+                      next:
+                        type: string
+                        format: url
+                        example: "/lab-test?page=3&limit=10"
+                      prev:
+                        type: string
+                        format: url
+                        example: "/lab-test?page=1&limit=10"
+                        
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          "$ref": "#/components/responses/500"
+    post:
+      operationId: createTest
+      security:
+        - bearerAuth: []
+      tags: [ Lab Test]
+      description: Create a new test
+      requestBody:
+        description: To create a new test user must need to provide valid data
+        content:
+          "application/json":
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  format: int32
+                  example: 1
+                test_name:
+                  type: string
+                  example: cbc
+                consultant_visit_id:
+                  type: integer
+                  format: int32
+                  example: 1
+                test_result:
+                  type: string
+                  example: good
+                normal_result:
+                  type: string
+                  example: clear
+                comment:
+                  type: string
+                  example: good condition
+                date:
+                  type: string
+                  format: date
+                  example: 2018-03-20  
+                test_type:
+                  type: string
+                  enum: [routine,typical]
+                  example: routine  
+              required: [id,consultant_visit_id,test_name,test_result,normal_result,comment,date,test_type]
+      responses:
+        "201":
+          description: Successfully created a new Lab test
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Lab_TestCreateDTO"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "500":
+          $ref: "#/components/responses/500"    
+  "/lab-test/{id}":
+    get:
+      tags: [Lab Test]
+      description: Get a Lab Test of a patient"
+      parameters: 
+        -  in: path
+           name: id
+           required: true
+           description: User ID
+           schema:
+             type: string
+             example: "65049e66f7926d91e2fcdc50"
+        - in: query
+          name: expand
+          description: expand Prescription and Medicines
+          schema:
+            type: string
+            example: "prescription, medicine" 
+      responses:
+        "200":
+          description: "Return a Test"
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Lab_Test"
+                  links:
+                    type: object
+                    properties:
+                      self:
+                        type: string
+                        format: url
+                        example: "/lab-test/1"
+                        
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          "$ref": "#/components/responses/500"    
+    patch:       
+      security:
+        - bearerAuth: []  
+      tags: [Lab Test]
+      description: Partially update a Test
+      parameters:
+        -  in: path
+           name: id
+           required: true
+           description: User ID
+           schema:
+             type: string
+             example: "65049e66f7926d91e2fcdc50"
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  format: int32
+                  example: 1
+                test_name:
+                  type: string
+                  example: cbc
+                consultant_visit_id:
+                  type: integer
+                  format: int32
+                  example: 1
+                test_result:
+                  type: string
+                  example: good
+                normal_result:
+                  type: string
+                  example: clear
+                comment:
+                  type: string
+                  example: good condition
+                date:
+                  type: integer
+                  format: date
+                  example: 3-5-23  
+                test_type:
+                  type: string
+                  enum: [routine,typical]
+                  example: routine  
+      responses:
+        "200":
+          description: "Successfully Updated"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/Lab_TestUpdateDTO"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
+        "500":
+          $ref: "#/components/responses/500"
+    delete:
+      security:
+        - bearerAuth: []
+      tags: [Lab Test]
+      description: Delete a Test by id
+      parameters:
+        -  in: path
+           name: id
+           required: true
+           description: User ID
+           schema:
+             type: string
+             example: "65049e66f7926d91e2fcdc50"
+      responses:
+        "204":
+          description: "Test deleted successfully"
+        "401":
+          $ref: "#/components/responses/401"
+        "404": 
+          $ref: "#/components/responses/404"
+        "500":
+          $ref: "#/components/responses/500"                              
+  "/Prescription":
+    get:
+      tags: [Prescription]
+      description: Get all Prescription of a patient"
+      parameters: 
+        - in: query
+          name: page
+          description: current page number
+          schema:
+            type: integer
+            format: int32
+            example: 2
+        - in: query
+          name: limit
+          description: maximum items to be returned
+          schema:
+            type: integer
+            format: int32
+            example: 10  
+        - in: query
+          name: search
+          description: Search Item name
+          schema:
+            type: string
+            example: title      
+        - in: query
+          name: searchBy
+          description: Search Item 
+          schema:
+            type: string
+            example: title   
+      responses:
+        "200":
+          description: "Return a List of Prescription"
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Prescription"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+                  links:
+                    type: object
+                    properties:
+                      self:
+                        type: string
+                        format: url
+                        example: "/prescription?page=2&limit=10"
+                      next:
+                        type: string
+                        format: url
+                        example: "/prescription?page=3&limit=10"
+                      prev:
+                        type: string
+                        format: url
+                        example: "/prescription?page=1&limit=10"
+                        
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          "$ref": "#/components/responses/500"
+    post:
+      operationId: createPrescription
+      security:
+        - bearerAuth: []
+      tags: [ Prescription]
+      description: Create a new Prescription
+      requestBody:
+        description: To create a new Prescrition user need to provide validData
+        content:
+          "application/json":
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  format: int32
+                  example: 1
+                diagnosis:
+                  type: string
+                  example: Cancer
+                consultant_visit_id:
+                  type: integer
+                  format: int32
+                  example: 1
+                advice:
+                  type: string
+                  example: good condition
+                date:
+                  type: integer
+                  format: date
+                  example: 3-5-23  
+                next_date:
+                  type: integer
+                  format: date
+                  example: 3-5-23   
+                medicine_id:
+                  type: array
+                  items:  
+                    type: integer
+                    example: [1,2,3]
+              required: [id,consultant_visit_id,medicine_id,next_date,diagnosis,advice ,date ]
+      responses:
+        "201":
+          description: Successfully created a new Prescription
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/PrescriptionCreateDTO"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "500":
+          $ref: "#/components/responses/500"    
+  "/prescription/{id}":
+    get:
+      tags: [Prescription]
+      description: Get a Lab Test of a patient"
+      parameters: 
+        -  in: path
+           name: id
+           required: true
+           description: User ID
+           schema:
+             type: string
+             example: "65049e66f7926d91e2fcdc50"
+        - in: query
+          name: expand
+          description: expand Prescription and Medicines
+          schema:
+            type: string
+            example: "prescription, medicine" 
+      responses:
+        "200":
+          description: "Return a Prescription"
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Prescription"
+                  links:
+                    type: object
+                    properties:
+                      self:
+                        type: string
+                        format: url
+                        example: "/prescription/1"
+                        
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          "$ref": "#/components/responses/500"    
+    patch:       
+      security:
+        - bearerAuth: []  
+      tags: [Prescription]
+      description: Partially update a Prescription
+      parameters:
+        -  in: path
+           name: id
+           required: true
+           description: User ID
+           schema:
+             type: string
+             example: "65049e66f7926d91e2fcdc50"
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  format: int32
+                  example: 1
+                diagnosis:
+                  type: string
+                  example: Cancer
+                consultant_visit_id:
+                  type: integer
+                  format: int32
+                  example: 1
+                advice:
+                  type: string
+                  example: good condition
+                date:
+                  type: integer
+                  format: date
+                  example: 3-5-23  
+                next_date:
+                  type: integer
+                  format: date
+                  example: 3-5-23   
+                medicine_id:
+                  type: array
+                  items:  
+                    type: integer
+                    example: [1,2,3]
+      responses:
+        "200":
+          description: "Successfully Updated"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/PrescriptionUpdateDTO"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
+        "500":
+          $ref: "#/components/responses/500"
+    delete:
+      security:
+        - bearerAuth: []
+      tags: [Prescription]
+      description: Delete a Prescription by id
+      parameters:
+        -  in: path
+           name: id
+           required: true
+           description: User ID
+           schema:
+             type: string
+             example: "65049e66f7926d91e2fcdc50"
+      responses:
+        "204":
+          description: "Prescription deleted successfully"
+        "401":
+          $ref: "#/components/responses/401"
+        "404": 
+          $ref: "#/components/responses/404"
+        "500":
+          $ref: "#/components/responses/500"                                        
+  "/medicine":
+    get:
+      tags: [Medicine ]
+      description: Get all Medicine of a patient"
+      parameters: 
+        - in: query
+          name: page
+          description: current page number
+          schema:
+            type: integer
+            format: int32
+            example: 2
+        - in: query
+          name: limit
+          description: maximum items to be returned
+          schema:
+            type: integer
+            format: int32
+            example: 10  
+        - in: query
+          name: search
+          description: Search Item name
+          schema:
+            type: string
+            example: title      
+        - in: query
+          name: searchBy
+          description: Search Item 
+          schema:
+            type: string
+            example: title   
+      responses:
+        "200":
+          description: "Return a List of Medicine "
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Medicine"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+                  links:
+                    type: object
+                    properties:
+                      self:
+                        type: string
+                        format: url
+                        example: "/medicine?page=2&limit=10"
+                      next:
+                        type: string
+                        format: url
+                        example: "/medicine?page=3&limit=10"
+                      prev:
+                        type: string
+                        format: url
+                        example: "/medicine?page=1&limit=10"
+                        
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          "$ref": "#/components/responses/500"
+    post:
+      operationId: createMedicine
+      security:
+        - bearerAuth: []
+      tags: [ Medicine]
+      description: Create a new Medicine
+      requestBody:
+        description: To create a new Medicine user need to provide validData
+        content:
+          "application/json":
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  format: int32
+                  example: 1 
+                prescription_id:
+                  type: integer
+                  format: int32
+                  example: 1
+                dose:
+                  type: string
+                  example: "2 times in a a"
+                duration:
+                  type: string
+                  example: '9 day' 
+              required: [id,prescription_id,dose,duration ]
+      responses:
+        "201":
+          description: Successfully created a new Medicine
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/MedicineCreateDTO"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "500":
+          $ref: "#/components/responses/500"    
+  "/medicine/{id}":
+    get:
+      tags: [Medicine]
+      description: Get a medicine of a patient"
+      parameters: 
+        -  in: path
+           name: id
+           required: true
+           description: User ID
+           schema:
+             type: string
+             example: "65049e66f7926d91e2fcdc50"
+        - in: query
+          name: expand
+          description: expand Prescription 
+          schema:
+            type: string
+            example: "prescription" 
+      responses:
+        "200":
+          description: "Return a medicine"
+          content:
+            "application/json":
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Medicine"
+                  links:
+                    type: object
+                    properties:
+                      self:
+                        type: string
+                        format: url
+                        example: "/medicine/1"
+                        
+        "400":
+          $ref: "#/components/responses/400"
+        "500":
+          "$ref": "#/components/responses/500"    
+    patch:       
+      security:
+        - bearerAuth: []  
+      tags: [Medicine]
+      description: Partially update a medicine
+      parameters:
+        -  in: path
+           name: id
+           required: true
+           description: User ID
+           schema:
+             type: string
+             example: "65049e66f7926d91e2fcdc50"
+      requestBody:
+        content:
+          "application/json":
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  format: int32
+                  example: 1 
+                prescription_id:
+                  type: integer
+                  format: int32
+                  example: 1
+                dose:
+                  type: string
+                  example: "2 times in a a"
+                duration:
+                  type: string
+                  example: '9 day' 
+      responses:
+        "200":
+          description: "Successfully Updated"
+          content:
+            "application/json":
+              schema:
+                $ref: "#/components/schemas/MedicineUpdateDTO"
+        "400":
+          $ref: "#/components/responses/400"
+        "401":
+          $ref: "#/components/responses/401"
+        "404":
+          $ref: "#/components/responses/404"
+        "500":
+          $ref: "#/components/responses/500"
+    delete:
+      security:
+        - bearerAuth: []
+      tags: [Medicine]
+      description: Delete a medicine by id
+      parameters:
+        -  in: path
+           name: id
+           required: true
+           description: User ID
+           schema:
+             type: string
+             example: "65049e66f7926d91e2fcdc50"
+      responses:
+        "204":
+          description: "Medicine deleted successfully"
+        "401":
+          $ref: "#/components/responses/401"
+        "404": 
+          $ref: "#/components/responses/404"
+        "500":
+          $ref: "#/components/responses/500"                                                  
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    Timestamp:
+      type: object
+      properties:
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+      required: [createdAt, updatedAt]
+    Consultant_visit:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+              format: int32
+              example: 1
+            consultant_name:
+              type: string
+              example: Sadi
+            consultant_id:
+              type: integer
+              format: int32
+              example: 1
+            visit_number:
+              type: integer
+              format: int32
+              example: 1
+            date:
+              type: string
+              format: date
+              example: 2/3/43
+          required: [id,consultant_name,consultant_id, visit_number, date]
+        - $ref: "#/components/schemas/Timestamp"
+    ConsultantVCreateDTO:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 201
+        message:
+          type: string
+          example: "Consultant visit created successfully"
+        data:
+          $ref: "#/components/schemas/Consultant_visit"
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+              format: url
+              example: "/consultant-visit/1"   
+    ConsultantVUpdateDTO:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 200
+        message:
+          type: string
+          example: Consultant Visit updated successfully
+        data:
+          $ref: "#/components/schemas/Consultant_visit"
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+              example: "/consultant-visit/1"  
+    General-Condition:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+              format: int32
+              example: 1
+            sign_symptom:
+              type: string
+              example: fever
+            consultant_visit_id:
+              type: integer
+              format: int32
+              example: 1
+            BP:
+              type: integer
+              format: int32
+              example: 80-90
+            pulse:
+              type: integer
+              format: int32
+              example: 62
+            weight:
+              type: integer
+              format: int32
+              example: 62
+            age:
+              type: integer
+              format: int32
+              example: 32  
+            body_condition:
+              type: string
+
+              example: bad  
+          required: [id,consultant_visit_id,BP,pulse,weight,age,body_condition]
+        - $ref: "#/components/schemas/Timestamp"
+    GeneralCreateDTO:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 201
+        message:
+          type: string
+          example: "General Condition created successfully"
+        data:
+          $ref: "#/components/schemas/General-Condition"
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+              format: url
+              example: "/general-condition/1"   
+    GeneralUpdateDTO:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 200
+        message:
+          type: string
+          example: General Condition updated successfully
+        data:
+          $ref: "#/components/schemas/General-Condition"
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+              example: "/general-condition/1"              
+    Lab_Test:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+              format: int32
+              example: 1
+            test_name:
+              type: string
+              example: cbc
+            consultant_visit_id:
+              type: integer
+              format: int32
+              example: 1
+            test_result:
+              type: string
+              example: good
+            normal_result:
+              type: string
+              example: clear
+            comment:
+              type: string
+              example: good condition
+            date:
+              type: integer
+              format: date
+              example: 3-5-23  
+            test_type:
+              type: string
+              enum: [routine,typical]
+              example: routine  
+          required: [id,consultant_visit_id,test_name,test_result,normal_result,comment,date,test_type]
+        - $ref: "#/components/schemas/Timestamp"
+    Lab_TestCreateDTO:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 201
+        message:
+          type: string
+          example: "Lab Test created successfully"
+        data:
+          $ref: "#/components/schemas/Lab_Test"
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+              format: url
+              example: "/lab-test/1"   
+    Lab_TestUpdateDTO:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 200
+        message:
+          type: string
+          example: Lab Test updated successfully
+        data:
+          $ref: "#/components/schemas/Lab_Test"
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+              example: "/lab-test/1"     
+    Prescription:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+              format: int32
+              example: 1
+            diagnosis:
+              type: string
+              example: Cancer
+            consultant_visit_id:
+              type: integer
+              format: int32
+              example: 1
+            advice:
+              type: string
+              example: good condition
+            date:
+              type: integer
+              format: date
+              example: 3-5-23  
+            next_date:
+              type: integer
+              format: date
+              example: 3-5-23   
+            medicine_id:
+              type: array
+              items:  
+                type: integer
+                example: [1,2,3]
+          required: [id,consultant_visit_id,medicine_id,next_date,diagnosis,advice ,date ]
+        - $ref: "#/components/schemas/Timestamp" 
+    PrescriptionCreateDTO:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 201
+        message:
+          type: string
+          example: "Prescription created Successfully"
+        data:
+          $ref: "#/components/schemas/Prescription"
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+              format: url
+              example: "/prescription/1"
+    PrescriptionUpdateDTO:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 200
+        message:
+          type: string
+          example: Prescription Updated successfully"
+        data:
+          $ref: "#/components/schemas/Prescription"
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+              format: url
+              example: "/prescription/1"                     
+    Medicine:
+      allOf:
+        - type: object
+          properties:
+            id:
+              type: integer
+              format: int32
+              example: 1 
+            prescription_id:
+              type: integer
+              format: int32
+              example: 1
+            dose:
+              type: string
+              example: "2 times in a a"
+            duration:
+              type: string
+              example: '9 day' 
+          required: [id,prescription_id,dose,duration ]
+        - $ref: "#/components/schemas/Timestamp"
+    MedicineCreateDTO:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 201
+        message:
+          type: string
+          example: "Medicine created Successfully"
+        data:
+          $ref: "#/components/schemas/Medicine"
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+              format: url
+              example: "/medicine/1"
+    MedicineUpdateDTO:
+      type: object
+      properties:
+        code:
+          type: integer
+          format: int32
+          example: 200
+        message:
+          type: string
+          example: Prescription Updated successfully"
+        data:
+          $ref: "#/components/schemas/Medicine"
+        links:
+          type: object
+          properties:
+            self:
+              type: string
+              format: url
+              example: "/medicine"           
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          format: int32
+          example: 2
+        limit:
+          type: integer
+          format: int32
+          example: 10
+        next:
+          type: integer
+          format: int32
+          example: 3
+        prev:
+          type: integer
+          format: int32
+          example: 1
+        totalPage:
+          type: integer
+          format: int32
+          example: 5
+        totalItems:
+          type: integer
+          format: int32
+          example: 50
+      required:
+        - page
+        - limit
+        - totalPage
+        - totalItems              
+  responses:
+    '400':
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+                example: 400
+              error:
+                type: string
+                example: Bad Request
+              data:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    field:
+                      type: string
+                      example: email
+                    message:
+                      type: string
+                      example: Invalid email
+                    in:
+                      type: string
+                      enum:
+                        - query
+                        - body
+                      example: body
+    '401':
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+                example: 401
+              error:
+                type: string
+                example: Unauthorized
+              message:
+                type: string
+                example: You don't have the right permissions
+    '404':
+      description: Resource Not Found
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+                example: 404
+              error:
+                type: string
+                example: Not Found
+              message:
+                type: string
+                example: Requested resource not found
+    '500':
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+                example: 500
+              error:
+                type: string
+                example: Internal Server Error
+              message:
+                type: string
+                example: We are sorry. Please try again later.
+  parameters:
+    pageParam:
+      in: query
+      name: page
+      description: current page number
+      required: true
+      schema:
+        type: integer
+        format: int32
+        example: 2
+    limitParam:
+      in: query
+      name: limit
+      description: maximum items to be returned
+      required: true
+      schema:
+        type: integer
+        format: int32
+        example: 10
+    sortTypeParam:
+      in: query
+      name: sort_type
+      description: type of sort (asc or dsc)
+      schema:
+        type: string
+        enum: [asc, dsc]
+        example: dsc
+    sortByParam:
+      in: query
+      name: sort_by
+      description: Sort key
+      schema:
+        type: string
+        example: updatedAt
+    searchParam:
+      in: query
+      name: search
+      description: Search term
+      schema:
+        type: string
+        example: title
+    idPathParam:
+      in: path
+      name: id
+      required: true
+      description: User ID
+      schema:
+        type: string
+        example: "64d268cdeef8c84bb18912db"
