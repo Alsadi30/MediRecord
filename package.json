@@ -4,13 +4,14 @@
   "description": "It will be a parsonal medical application, This app targeted for every person of the society either diseased or not. The Primary function of this app is to track and maintain a persons all medical and this related data. This application should be able to contain a persons general information, physical health status, data of each time met with consultant including consultants info, medical tests and Their results,  medication and routine tests information. There should be all the advises of the consultants. All the information should be aligned with related or origin off it. Any info shouldn’t be detouched.",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon index.js",
+    "dev": "nodemon src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "Sadi",
   "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "cors": "^2.8.5",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-openapi-validator": "^5.0.6",

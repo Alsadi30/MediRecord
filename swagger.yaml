@@ -1,7 +1,7 @@
 openapi: 3.0.3
 info:
   version: 1.0.1
-  title: MediRecord API  
+  title: MediRecord
   description: |-
     It will be a parsonal medical application, This app targeted for every person of the society either diseased or not. The Primary function of this app is to track and maintain a persons all medical and this related data. This application should be able to contain a persons general information, physical health status, data of each time met with consultant including consultants info, medical tests and Their results,  medication and routine tests information. There should be all the advises of the consultants.
 
@@ -98,11 +98,11 @@ paths:
                 email:
                   type: string
                   format: email
-                  example: sadi@example.com
+                  example: abd@gmail.com
                 password:
                   type: string
                   format: password
-                  example: Password123
+                  example: pass123
               required: [email, password]
       responses:
         "200":
@@ -137,40 +137,15 @@ paths:
           "$ref": "#/components/responses/500"      
   "/consultant-visit":
     get:
+      security:
+        - bearerAuth: []    
       tags: [Consultant_visit] 
-      description: Get all visits to consultants of a patient"
-      parameters:
-        - in: query
-          name: page
-          description: current page number
-          schema:
-            type: integer
-            format: int32
-            example: 2
-        - in: query
-          name: limit
-          description: maximum items to be returned
-          schema:
-            type: integer
-            format: int32
-            example: 10  
-        - in: query
-          name: search
-          description: Search Item name
-          schema:
-            type: string
-            example: title      
-        - in: query
-          name: searchBy
-          description: Search Item 
-          schema:
-            type: string
-            example: title                      
+      description: Get all visits to consultants of a patient
+      parameters: 
+        - $ref: "#/components/parameters/pageParam"
         - $ref: "#/components/parameters/limitParam"
-        - $ref: "#/components/parameters/sortTypeParam"
-        - $ref: "#/components/parameters/sortByParam"
-        - $ref: "#/components/parameters/searchParam"
-          name: search
+        - $ref: "#/components/parameters/searchByParam"
+        - $ref: "#/components/parameters/searchParam"        
       responses:
         "200":
           description: "Return a List of visits"
@@ -221,7 +196,7 @@ paths:
                   example: Sadi
                 consultant:
                   type: string
-                  example: "6503faf94d38ccba349d4f0e"
+                  example: 65049e66f7926d91e2fcdc50
                 visit_no:
                   type: integer
                   format: int32
@@ -245,22 +220,18 @@ paths:
           $ref: "#/components/responses/500"    
   "/consultant-visit/{id}":
     get:
+      security:
+        - bearerAuth: []    
       tags: [Consultant_visit] 
       description: Get a visit to consultants of a patient"
       parameters: 
-        -  in: path
-           name: id
-           required: true
-           description: User ID
-           schema:
-             type: string
-             example: "65049e66f7926d91e2fcdc50"
-        -  in: query
-           name: expand
-           description: expand Prescription and Medicines
-           schema:
-             type: string
-             example: "prescription, medicine" 
+        - $ref: "#/components/parameters/idPathParam"
+        - in: query
+          name: expand
+          description: expand Prescription and Medicines
+          schema:
+            type: string
+            example: "prescription, medicine" 
       responses:
         "200":
           description: "Return a visit"
@@ -289,13 +260,7 @@ paths:
       tags: [Consultant_visit]
       description: Partially update an Visit 
       parameters:
-         - in: path
-           name: id
-           required: true
-           description: User ID
-           schema:
-             type: string
-             example: "65049e66f7926d91e2fcdc50"
+        - $ref: "#/components/parameters/idPathParam"
       requestBody:
         content:
           "application/json":
@@ -305,18 +270,17 @@ paths:
                 consultant_name:
                   type: string
                   example: Sadi
-                consultant_id:
-                  type: integer
-                  format: int32
-                  example: 1
-                visit_number:
+                consultant:
+                  type: string
+                  example: 6503fa8cb7e138d06a47ab57
+                visit_no:
                   type: integer
                   format: int32
                   example: 1
                 date:
                   type: string
                   format: date
-                  example: 2/3/43
+                  example: 2018-03-20                  
       responses:
         "200":
           description: "Successfully Updated"
@@ -338,13 +302,7 @@ paths:
       tags: [Consultant_visit]
       description: Delete an consultant visit by id
       parameters:
-         - in: path
-           name: id
-           required: true
-           description: User ID
-           schema:
-             type: string
-             example: "65049e66f7926d91e2fcdc50"
+        - $ref: "#/components/parameters/idPathParam"
       responses:
         "204":
           description: "Consultant Visit deleted successfully"
@@ -356,35 +314,15 @@ paths:
           $ref: "#/components/responses/500"          
   "/general-condition":
     get:
+      security:
+        - bearerAuth: []    
       tags: [General Condition]
       description: Get all General Conditions of a patient"
       parameters: 
-        - in: query
-          name: page
-          description: current page number
-          schema:
-            type: integer
-            format: int32
-            example: 2
-        - in: query
-          name: limit
-          description: maximum items to be returned
-          schema:
-            type: integer
-            format: int32
-            example: 10  
-        - in: query
-          name: search
-          description: Search Item name
-          schema:
-            type: string
-            example: title      
-        - in: query
-          name: searchBy
-          description: Search Item 
-          schema:
-            type: string
-            example: title   
+        - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/pageParam"
+        - $ref: "#/components/parameters/searchByParam"
+        - $ref: "#/components/parameters/searchParam" 
       responses:
         "200":
           description: "Return a List of General Condition"
@@ -422,9 +360,9 @@ paths:
       security:
         - bearerAuth: []
       tags: [General Condition]
-      description: Create a new visit
+      description: Create a new general condition
       requestBody:
-        description: To create a new visit user must need to provide valid data
+        description: To create a new General condition user must need to provide valid data
         content:
           "application/json":
             schema:
@@ -434,11 +372,11 @@ paths:
                   type: string
                   example: fever
                 consultant_visit_id:
-                  type: string 
-                  example: "65049e66f7926d91e2fcdc50"
+                  type: string
+                  example: 65049e66f7926d91e2fcdc50
                 BP:
                   type: string
-                  example: "80-90"
+                  example: 80-90
                 pulse:
                   type: integer
                   format: int32
@@ -470,16 +408,12 @@ paths:
           $ref: "#/components/responses/500"    
   "/general-condition/{id}":
     get:
+      security:
+        - bearerAuth: []    
       tags: [General Condition]
       description: Get a General Condition of a patient"
-      parameters:
-        -  in: path
-           name: id
-           required: true
-           description: User ID
-           schema:
-             type: string
-             example: "65049e66f7926d91e2fcdc50"
+      parameters: 
+        - $ref: "#/components/parameters/idPathParam"
         - in: query
           name: expand
           description: expand Prescription and Medicines
@@ -514,13 +448,7 @@ paths:
       tags: [General Condition]
       description: Partially update an Condition
       parameters:
-        -  in: path
-           name: id
-           required: true
-           description: User ID
-           schema:
-             type: string
-             example: "65049e66f7926d91e2fcdc50"
+        - $ref: "#/components/parameters/idPathParam"
       requestBody:
         content:
           "application/json":
@@ -551,7 +479,7 @@ paths:
                   format: int32
                   example: 32  
                 body_condition:
-                  type: string
+                  type: string 
                   example: bad  
       responses:
         "200":
@@ -574,13 +502,7 @@ paths:
       tags: [General Condition]
       description: Delete a Condition by id
       parameters:
-        -  in: path
-           name: id
-           required: true
-           description: User ID
-           schema:
-             type: string
-             example: "65049e66f7926d91e2fcdc50"
+        - $ref: "#/components/parameters/idPathParam"
       responses:
         "204":
           description: "Condition deleted successfully"
@@ -589,38 +511,16 @@ paths:
         "404":
           $ref: "#/components/responses/404"
         "500":
-          $ref: "#/components/responses/500"                    
+          $ref: "#/components/responses/500"          
   "/lab-test":
     get:
+      security:
+        - bearerAuth: []    
       tags: [Lab Test]
       description: Get all Lab test of a patient"
       parameters: 
-        - in: query
-          name: page
-          description: current page number
-          schema:
-            type: integer
-            format: int32
-            example: 2
-        - in: query
-          name: limit
-          description: maximum items to be returned
-          schema:
-            type: integer
-            format: int32
-            example: 10  
-        - in: query
-          name: search
-          description: Search Item name
-          schema:
-            type: string
-            example: title      
-        - in: query
-          name: searchBy
-          description: Search Item 
-          schema:
-            type: string
-            example: title   
+        - $ref: "#/components/parameters/limitParam"
+
       responses:
         "200":
           description: "Return a List of Lab Test"
@@ -671,30 +571,30 @@ paths:
                   format: int32
                   example: 1
                 test_name:
-                  type: string
+                  type: string 
                   example: cbc
                 consultant_visit_id:
                   type: integer
                   format: int32
                   example: 1
                 test_result:
-                  type: string
+                  type: string 
                   example: good
                 normal_result:
-                  type: string
+                  type: string 
                   example: clear
                 comment:
-                  type: string
+                  type: string 
                   example: good condition
                 date:
-                  type: string
+                  type: integer
                   format: date
-                  example: 2018-03-20  
+                  example: 3-5-23  
                 test_type:
                   type: string
                   enum: [routine,typical]
                   example: routine  
-              required: [id,consultant_visit_id,test_name,test_result,normal_result,comment,date,test_type]
+              required: [consultant_visit_id,test_name,test_result,normal_result,comment,date,test_type]
       responses:
         "201":
           description: Successfully created a new Lab test
@@ -710,16 +610,12 @@ paths:
           $ref: "#/components/responses/500"    
   "/lab-test/{id}":
     get:
+      security:
+        - bearerAuth: []    
       tags: [Lab Test]
       description: Get a Lab Test of a patient"
       parameters: 
-        -  in: path
-           name: id
-           required: true
-           description: User ID
-           schema:
-             type: string
-             example: "65049e66f7926d91e2fcdc50"
+        - $ref: "#/components/parameters/idPathParam"
         - in: query
           name: expand
           description: expand Prescription and Medicines
@@ -754,13 +650,7 @@ paths:
       tags: [Lab Test]
       description: Partially update a Test
       parameters:
-        -  in: path
-           name: id
-           required: true
-           description: User ID
-           schema:
-             type: string
-             example: "65049e66f7926d91e2fcdc50"
+        - $ref: "#/components/parameters/idPathParam"
       requestBody:
         content:
           "application/json":
@@ -772,25 +662,24 @@ paths:
                   format: int32
                   example: 1
                 test_name:
-                  type: string
+                  type: string 
                   example: cbc
                 consultant_visit_id:
-                  type: integer
-                  format: int32
+                  type: string 
                   example: 1
                 test_result:
-                  type: string
+                  type: string 
                   example: good
                 normal_result:
-                  type: string
+                  type: string 
                   example: clear
                 comment:
-                  type: string
+                  type: string 
                   example: good condition
                 date:
                   type: integer
                   format: date
-                  example: 3-5-23  
+                  example: 23-8-7 
                 test_type:
                   type: string
                   enum: [routine,typical]
@@ -816,13 +705,7 @@ paths:
       tags: [Lab Test]
       description: Delete a Test by id
       parameters:
-        -  in: path
-           name: id
-           required: true
-           description: User ID
-           schema:
-             type: string
-             example: "65049e66f7926d91e2fcdc50"
+        - $ref: "#/components/parameters/idPathParam"
       responses:
         "204":
           description: "Test deleted successfully"
@@ -834,35 +717,13 @@ paths:
           $ref: "#/components/responses/500"                              
   "/Prescription":
     get:
+      security:
+        - bearerAuth: []    
       tags: [Prescription]
       description: Get all Prescription of a patient"
       parameters: 
-        - in: query
-          name: page
-          description: current page number
-          schema:
-            type: integer
-            format: int32
-            example: 2
-        - in: query
-          name: limit
-          description: maximum items to be returned
-          schema:
-            type: integer
-            format: int32
-            example: 10  
-        - in: query
-          name: search
-          description: Search Item name
-          schema:
-            type: string
-            example: title      
-        - in: query
-          name: searchBy
-          description: Search Item 
-          schema:
-            type: string
-            example: title   
+        - $ref: "#/components/parameters/limitParam"
+
       responses:
         "200":
           description: "Return a List of Prescription"
@@ -909,33 +770,22 @@ paths:
               type: object
               properties:
                 id:
-                  type: integer
-                  format: int32
+                  type: string
                   example: 1
                 diagnosis:
-                  type: string
+                  type: string 
                   example: Cancer
                 consultant_visit_id:
-                  type: integer
-                  format: int32
+                  type: string 
                   example: 1
                 advice:
-                  type: string
-                  example: good condition
-                date:
-                  type: integer
-                  format: date
-                  example: 3-5-23  
+                  type: string 
+                  example: good condition  
                 next_date:
                   type: integer
                   format: date
-                  example: 3-5-23   
-                medicine_id:
-                  type: array
-                  items:  
-                    type: integer
-                    example: [1,2,3]
-              required: [id,consultant_visit_id,medicine_id,next_date,diagnosis,advice ,date ]
+                  example: 23-8-09
+              required: [consultant_visit_id,next_date,diagnosis,advice ]
       responses:
         "201":
           description: Successfully created a new Prescription
@@ -951,16 +801,12 @@ paths:
           $ref: "#/components/responses/500"    
   "/prescription/{id}":
     get:
+      security:
+        - bearerAuth: []    
       tags: [Prescription]
       description: Get a Lab Test of a patient"
       parameters: 
-        -  in: path
-           name: id
-           required: true
-           description: User ID
-           schema:
-             type: string
-             example: "65049e66f7926d91e2fcdc50"
+        - $ref: "#/components/parameters/idPathParam"
         - in: query
           name: expand
           description: expand Prescription and Medicines
@@ -995,13 +841,7 @@ paths:
       tags: [Prescription]
       description: Partially update a Prescription
       parameters:
-        -  in: path
-           name: id
-           required: true
-           description: User ID
-           schema:
-             type: string
-             example: "65049e66f7926d91e2fcdc50"
+        - $ref: "#/components/parameters/idPathParam"
       requestBody:
         content:
           "application/json":
@@ -1013,28 +853,19 @@ paths:
                   format: int32
                   example: 1
                 diagnosis:
-                  type: string
+                  type: string 
                   example: Cancer
                 consultant_visit_id:
-                  type: integer
-                  format: int32
+                  type: string
                   example: 1
                 advice:
-                  type: string
-                  example: good condition
-                date:
-                  type: integer
-                  format: date
-                  example: 3-5-23  
+                  type: string 
+                  example: good condition   
                 next_date:
                   type: integer
                   format: date
-                  example: 3-5-23   
-                medicine_id:
-                  type: array
-                  items:  
-                    type: integer
-                    example: [1,2,3]
+                  example: 24-3-3
+ 
       responses:
         "200":
           description: "Successfully Updated"
@@ -1056,13 +887,7 @@ paths:
       tags: [Prescription]
       description: Delete a Prescription by id
       parameters:
-        -  in: path
-           name: id
-           required: true
-           description: User ID
-           schema:
-             type: string
-             example: "65049e66f7926d91e2fcdc50"
+        - $ref: "#/components/parameters/idPathParam"
       responses:
         "204":
           description: "Prescription deleted successfully"
@@ -1074,35 +899,14 @@ paths:
           $ref: "#/components/responses/500"                                        
   "/medicine":
     get:
+      security:
+        - bearerAuth: []    
       tags: [Medicine ]
       description: Get all Medicine of a patient"
       parameters: 
-        - in: query
-          name: page
-          description: current page number
-          schema:
-            type: integer
-            format: int32
-            example: 2
-        - in: query
-          name: limit
-          description: maximum items to be returned
-          schema:
-            type: integer
-            format: int32
-            example: 10  
-        - in: query
-          name: search
-          description: Search Item name
-          schema:
-            type: string
-            example: title      
-        - in: query
-          name: searchBy
-          description: Search Item 
-          schema:
-            type: string
-            example: title   
+        - $ref: "#/components/parameters/pageParam"
+        - $ref: "#/components/parameters/limitParam"
+
       responses:
         "200":
           description: "Return a List of Medicine "
@@ -1149,20 +953,18 @@ paths:
               type: object
               properties:
                 id:
-                  type: integer
-                  format: int32
+                  type: string
                   example: 1 
-                prescription_id:
-                  type: integer
-                  format: int32
+                prescription:
+                  type: string
                   example: 1
                 dose:
-                  type: string
+                  type: string 
                   example: "2 times in a a"
                 duration:
-                  type: string
+                  type: string 
                   example: '9 day' 
-              required: [id,prescription_id,dose,duration ]
+              required: [ prescription,dose,duration ]
       responses:
         "201":
           description: Successfully created a new Medicine
@@ -1178,16 +980,12 @@ paths:
           $ref: "#/components/responses/500"    
   "/medicine/{id}":
     get:
+      security:
+        - bearerAuth: []    
       tags: [Medicine]
       description: Get a medicine of a patient"
       parameters: 
-        -  in: path
-           name: id
-           required: true
-           description: User ID
-           schema:
-             type: string
-             example: "65049e66f7926d91e2fcdc50"
+        - $ref: "#/components/parameters/idPathParam"
         - in: query
           name: expand
           description: expand Prescription 
@@ -1222,13 +1020,7 @@ paths:
       tags: [Medicine]
       description: Partially update a medicine
       parameters:
-        -  in: path
-           name: id
-           required: true
-           description: User ID
-           schema:
-             type: string
-             example: "65049e66f7926d91e2fcdc50"
+        - $ref: "#/components/parameters/idPathParam"
       requestBody:
         content:
           "application/json":
@@ -1236,18 +1028,16 @@ paths:
               type: object
               properties:
                 id:
-                  type: integer
-                  format: int32
+                  type: string
                   example: 1 
-                prescription_id:
-                  type: integer
-                  format: int32
+                prescription:
+                  type: string
                   example: 1
                 dose:
-                  type: string
+                  type: string 
                   example: "2 times in a a"
                 duration:
-                  type: string
+                  type: string 
                   example: '9 day' 
       responses:
         "200":
@@ -1270,13 +1060,7 @@ paths:
       tags: [Medicine]
       description: Delete a medicine by id
       parameters:
-        -  in: path
-           name: id
-           required: true
-           description: User ID
-           schema:
-             type: string
-             example: "65049e66f7926d91e2fcdc50"
+        - $ref: "#/components/parameters/idPathParam"
       responses:
         "204":
           description: "Medicine deleted successfully"
@@ -1285,7 +1069,7 @@ paths:
         "404": 
           $ref: "#/components/responses/404"
         "500":
-          $ref: "#/components/responses/500"                                                  
+          $ref: "#/components/responses/500"   
 components:
   securitySchemes:
     bearerAuth:
@@ -1298,29 +1082,26 @@ components:
       properties:
         createdAt:
           type: string
-          format: date-time
+          format: date
         updatedAt:
           type: string
-          format: date-time
+          format: date
       required: [createdAt, updatedAt]
     Consultant_visit:
       allOf:
         - type: object
           properties:
             id:
-              type: integer
-              format: int32
+              type: string
               example: 1
             consultant_name:
-              type: string
+              type: string 
               example: Sadi
             consultant_id:
-              type: integer
-              format: int32
+              type: string
               example: 1
-            visit_number:
-              type: integer
-              format: int32
+            visit_no:
+              type: string
               example: 1
             date:
               type: string
@@ -1374,15 +1155,13 @@ components:
               format: int32
               example: 1
             sign_symptom:
-              type: string
+              type: string 
               example: fever
             consultant_visit_id:
-              type: integer
-              format: int32
+              type: string
               example: 1
             BP:
-              type: integer
-              format: int32
+              type: string
               example: 80-90
             pulse:
               type: integer
@@ -1397,8 +1176,7 @@ components:
               format: int32
               example: 32  
             body_condition:
-              type: string
-
+              type: string 
               example: bad  
           required: [id,consultant_visit_id,BP,pulse,weight,age,body_condition]
         - $ref: "#/components/schemas/Timestamp"
@@ -1444,24 +1222,22 @@ components:
         - type: object
           properties:
             id:
-              type: integer
-              format: int32
+              type: string
               example: 1
             test_name:
-              type: string
+              type: string 
               example: cbc
             consultant_visit_id:
-              type: integer
-              format: int32
+              type: string
               example: 1
             test_result:
-              type: string
+              type: string 
               example: good
             normal_result:
-              type: string
+              type: string 
               example: clear
             comment:
-              type: string
+              type: string 
               example: good condition
             date:
               type: integer
@@ -1519,28 +1295,18 @@ components:
               format: int32
               example: 1
             diagnosis:
-              type: string
+              type: string 
               example: Cancer
             consultant_visit_id:
-              type: integer
-              format: int32
+              type: string
               example: 1
             advice:
-              type: string
+              type: string 
               example: good condition
-            date:
-              type: integer
-              format: date
-              example: 3-5-23  
             next_date:
               type: integer
               format: date
-              example: 3-5-23   
-            medicine_id:
-              type: array
-              items:  
-                type: integer
-                example: [1,2,3]
+              example: 23-6-8   
           required: [id,consultant_visit_id,medicine_id,next_date,diagnosis,advice ,date ]
         - $ref: "#/components/schemas/Timestamp" 
     PrescriptionCreateDTO:
@@ -1594,12 +1360,12 @@ components:
               format: int32
               example: 1
             dose:
-              type: string
+              type: string 
               example: "2 times in a a"
             duration:
-              type: string
+              type: string 
               example: '9 day' 
-          required: [id,prescription_id,dose,duration ]
+          required: [prescription_id,dose,duration ]
         - $ref: "#/components/schemas/Timestamp"
     MedicineCreateDTO:
       type: object
@@ -1645,7 +1411,7 @@ components:
         page:
           type: integer
           format: int32
-          example: 2
+          example: 1
         limit:
           type: integer
           format: int32
@@ -1653,11 +1419,11 @@ components:
         next:
           type: integer
           format: int32
-          example: 3
+          example: 2
         prev:
           type: integer
           format: int32
-          example: 1
+          example: 0
         totalPage:
           type: integer
           format: int32
@@ -1671,6 +1437,7 @@ components:
         - limit
         - totalPage
         - totalItems              
+ 
   responses:
     '400':
       description: Bad Request
@@ -1759,47 +1526,37 @@ components:
       in: query
       name: page
       description: current page number
-      required: true
       schema:
         type: integer
         format: int32
-        example: 2
+        example: 1
     limitParam:
       in: query
       name: limit
       description: maximum items to be returned
-      required: true
       schema:
         type: integer
         format: int32
-        example: 10
-    sortTypeParam:
-      in: query
-      name: sort_type
-      description: type of sort (asc or dsc)
-      schema:
-        type: string
-        enum: [asc, dsc]
-        example: dsc
-    sortByParam:
-      in: query
-      name: sort_by
-      description: Sort key
-      schema:
-        type: string
-        example: updatedAt
+        example: 5
     searchParam:
       in: query
       name: search
       description: Search term
       schema:
         type: string
-        example: title
+        example: jhon   
+    searchByParam:
+      in: query
+      name: search
+      description: Search Item
+      schema:
+        type: string
+        example: name           
     idPathParam:
       in: path
       name: id
       required: true
-      description: User ID
+      description: Prescription ID
       schema:
         type: string
-        example: "64d268cdeef8c84bb18912db"
+        example: 1
