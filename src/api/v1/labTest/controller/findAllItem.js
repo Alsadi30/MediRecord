@@ -10,6 +10,7 @@ const findAllItems = async (req, res, next) => {
   const search = req.query.search || defaults.search
   const searchBy = req.query.searchBy || defaults.searchBy
   const Model = LabTest
+  const user = req.user.id
   try {
     // data
     const labTest = await labTestService.findAll({
@@ -17,7 +18,8 @@ const findAllItems = async (req, res, next) => {
       limit,
       search,
       searchBy,
-      Model
+      Model,
+      user
     })
 
     const data = query.getTransformedItems({

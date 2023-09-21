@@ -2,13 +2,15 @@ const consultantVisitService = require('../../../../lib/consultantVisitService')
 
 const create = async (req, res, next) => {
   const { consultant_name, consultant, visit_no, date } = req.body
+  const user = req.user.id
 
   try {
     const consultantVisit = await consultantVisitService.create({
       consultant_name,
       consultant,
       visit_no,
-      date
+      date,
+      user
     })
 
     const response = {

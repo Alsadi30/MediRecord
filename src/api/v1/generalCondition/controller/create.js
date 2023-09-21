@@ -10,6 +10,7 @@ const create = async (req, res, next) => {
     age,
     body_condition
   } = req.body
+  const user = req.user.id
 
   try {
     const generalCondition = await generalConditionService.create({
@@ -19,7 +20,8 @@ const create = async (req, res, next) => {
       pulse,
       weight,
       age,
-      body_condition
+      body_condition,
+      user
     })
 
     const response = {

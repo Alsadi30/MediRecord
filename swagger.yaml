@@ -10,19 +10,19 @@ servers:
     url: "http://localhost:8000"
 tags: 
  - name: Auth
-   description: All auth related end point will be here
+   description: All auth related end points will be here
  - name: User
-   description: All user related end point will be here
+   description: All user related end points will be here
  - name: Consultant_visit
-   description: All Consultant_visit related end point will be here
+   description: All Consultant_visit related end points will be here
  - name: General Condition
-   description: All General Condition related end point will be here
+   description: All General Condition related end points will be here
  - name: Lab Test
-   description: All Lab Test related end point will be here
+   description: All Lab Test related end points will be here
  - name: Prescription
-   description: All Prescription related end point will be here
+   description: All Prescription related end points will be here
  - name: Medicine
-   description: All Medicine related end point will be here
+   description: All Medicine related end points will be here
 paths:
   "/auth/signup":
     post:
@@ -41,19 +41,22 @@ paths:
                     type: string
                     format: email
                     example: abd@gamil.com
-                  dateofbirth:
+                  phone:
+                    type: integer
+                    example: 01737865784                    
+                  birthdate:
                     type: string
                     format: date
-                    example: 2/3/43
+                    example: 2018-03-20
                   password: 
                     type: string
                     format: password
                     example: pass123
-                  type:
+                  role:
                     type: string
                     enum: [patient, consultant]
                     example: patient
-                required: [name, email,dateofbirth,type, password]
+                required: [name, email,birthdate,role, password]
       responses:
         "201":
             description: Signup successful
@@ -223,15 +226,15 @@ paths:
       security:
         - bearerAuth: []    
       tags: [Consultant_visit] 
-      description: Get a visit to consultants of a patient"
+      description: Get a visit to consultants of a patient
       parameters: 
         - $ref: "#/components/parameters/idPathParam"
         - in: query
           name: expand
-          description: expand Prescription and Medicines
+          description: expand Prescription 
           schema:
             type: string
-            example: "prescription, medicine" 
+            example: "prescription" 
       responses:
         "200":
           description: "Return a visit"
@@ -317,7 +320,7 @@ paths:
       security:
         - bearerAuth: []    
       tags: [General Condition]
-      description: Get all General Conditions of a patient"
+      description: Get all General Conditions of a patient
       parameters: 
         - $ref: "#/components/parameters/limitParam"
         - $ref: "#/components/parameters/pageParam"
@@ -517,9 +520,12 @@ paths:
       security:
         - bearerAuth: []    
       tags: [Lab Test]
-      description: Get all Lab test of a patient"
+      description: Get all Lab test of a patient
       parameters: 
+        - $ref: "#/components/parameters/pageParam"
         - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/searchByParam"
+        - $ref: "#/components/parameters/searchParam"   
 
       responses:
         "200":
@@ -566,17 +572,15 @@ paths:
             schema:
               type: object
               properties:
-                id:
-                  type: integer
-                  format: int32
-                  example: 1
                 test_name:
                   type: string 
                   example: cbc
                 consultant_visit_id:
-                  type: integer
-                  format: int32
-                  example: 1
+                  type: string
+                  example: 650be27c7ad77ba34f513f9e
+                prescription:
+                  type: string
+                  example: 650be27c7ad77ba34f513f9e                  
                 test_result:
                   type: string 
                   example: good
@@ -587,9 +591,9 @@ paths:
                   type: string 
                   example: good condition
                 date:
-                  type: integer
+                  type: string
                   format: date
-                  example: 3-5-23  
+                  example: 2018-03-20
                 test_type:
                   type: string
                   enum: [routine,typical]
@@ -618,10 +622,10 @@ paths:
         - $ref: "#/components/parameters/idPathParam"
         - in: query
           name: expand
-          description: expand Prescription and Medicines
+          description: expand Prescription and Consultant Visit
           schema:
             type: string
-            example: "prescription, medicine" 
+            example: "prescription, consultant-visit" 
       responses:
         "200":
           description: "Return a Test"
@@ -720,9 +724,12 @@ paths:
       security:
         - bearerAuth: []    
       tags: [Prescription]
-      description: Get all Prescription of a patient"
+      description: Get all Prescription of a patient
       parameters: 
+        - $ref: "#/components/parameters/pageParam"
         - $ref: "#/components/parameters/limitParam"
+        - $ref: "#/components/parameters/searchByParam"
+        - $ref: "#/components/parameters/searchParam"
 
       responses:
         "200":
@@ -769,23 +776,23 @@ paths:
             schema:
               type: object
               properties:
-                id:
-                  type: string
-                  example: 1
                 diagnosis:
                   type: string 
                   example: Cancer
                 consultant_visit_id:
                   type: string 
-                  example: 1
+                  example: 650be27c7ad77ba34f513f9e
+                general_condition:
+                  type: string 
+                  example: 650beecb8786f31df3218b2f      
                 advice:
                   type: string 
                   example: good condition  
-                next_date:
-                  type: integer
+                nextdate:
+                  type: string
                   format: date
-                  example: 23-8-09
-              required: [consultant_visit_id,next_date,diagnosis,advice ]
+                  example: 2018-03-20
+              required: [consultant_visit_id,general_condition,nextdate,diagnosis,advice ]
       responses:
         "201":
           description: Successfully created a new Prescription
@@ -812,7 +819,7 @@ paths:
           description: expand Prescription and Medicines
           schema:
             type: string
-            example: "prescription, medicine" 
+            example: "general-condition, medicine , consultant-visit, lab-test"
       responses:
         "200":
           description: "Return a Prescription"
@@ -952,12 +959,12 @@ paths:
             schema:
               type: object
               properties:
-                id:
+                medicine_name:
                   type: string
-                  example: 1 
+                  example: Napa
                 prescription:
                   type: string
-                  example: 1
+                  example: 650c02b3ac3db8413631ca32
                 dose:
                   type: string 
                   example: "2 times in a a"
@@ -1027,15 +1034,12 @@ paths:
             schema:
               type: object
               properties:
-                id:
-                  type: string
-                  example: 1 
                 prescription:
                   type: string
-                  example: 1
+                  example: 650c02b3ac3db8413631ca32
                 dose:
                   type: string 
-                  example: "2 times in a a"
+                  example: "2 times"
                 duration:
                   type: string 
                   example: '9 day' 
@@ -1544,10 +1548,10 @@ components:
       description: Search term
       schema:
         type: string
-        example: jhon   
+        example: jhon doe
     searchByParam:
       in: query
-      name: search
+      name: searchBy
       description: Search Item
       schema:
         type: string

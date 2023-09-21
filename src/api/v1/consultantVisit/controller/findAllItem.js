@@ -17,7 +17,8 @@ const findAllItems = async (req, res, next) => {
       limit,
       search,
       searchBy,
-      Model
+      Model,
+      user: req.user.id
     })
 
     const data = query.getTransformedItems({

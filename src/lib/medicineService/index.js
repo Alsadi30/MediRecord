@@ -7,13 +7,15 @@ const findAll = async ({
   page = defaults.page,
   limit = defaults.limit,
   search = defaults.search,
-  searchBy = defaults.searchBy
+  searchBy = defaults.searchBy,
+  user
 }) => {
   const filter = {
-    [searchBy]: { $regex: search, $options: 'i' }
+    [searchBy]: { $regex: search, $options: 'i' },
+    user
   }
 
-  const medicine = await Medicine.find(search ? filter : {})
+  const medicine = await Medicine.find(search ? filter : { user })
     .skip(page * limit - limit)
     .limit(limit)
 

@@ -1,20 +1,22 @@
 const { LabTest } = require('../../model')
 const defaults = require('../../config/defaults')
 const { notFound } = require('../../utils/error')
-const findPresAddId = require('../../utils/findModelAndAddId')
+const findPrescriptionAddId = require('../prescriptionService/findPrescriptionAddId')
 
 const findAll = async ({
   page = defaults.page,
   limit = defaults.limit,
   search = defaults.search,
-  searchBy = defaults.searchBy
+  searchBy = defaults.searchBy,
+  user
 }) => {
   const filter = {
-    [searchBy]: { $regex: search, $options: 'i' }
+    [searchBy]: { $regex: search, $options: 'i' },
+    user
   }
 
-  const labTest = await LabTest.find(search ? filter : {})
-    // .populate({ path: 'consultant', select: 'name' })
+  const labTest = await LabTest.find(search ? filter : { user })
+    .populate({ path: 'consultant_visit_id', select: 'consultant_name' })
     .skip(page * limit - limit)
     .limit(limit)
 
@@ -32,18 +34,9 @@ const create = async ({
   prescription,
   comment,
   date,
-  test_type
+  test_type,
+  user
 }) => {
-  console.log(
-    test_name,
-    test_result,
-    normal_result,
-    consultant_visit_id,
-    prescription,
-    comment,
-    date,
-    test_type
-  )
   if (
     !test_name ||
     !consultant_visit_id ||
@@ -52,7 +45,8 @@ const create = async ({
     !normal_result ||
     !comment ||
     !date ||
-    !test_type
+    !test_type ||
+    !user
   ) {
     const error = new Error('Invalid parameters')
     error.status = 400
@@ -67,12 +61,13 @@ const create = async ({
     consultant_visit_id,
     comment,
     date,
-    test_type
+    test_type,
+    user
   })
 
   await labTest.save()
 
-  await findPresAddId(prescription, 'labtests', labTest.id)
+  await findPrescriptionAddId(prescription, 'labtests', labTest.id)
 
   return {
     ...labTest._doc,
@@ -86,17 +81,24 @@ const findSingleItem = async ({ id, expand = '' }) => {
   expand = expand.split(',').map(item => item.trim())
 
   const labTest = await LabTest.findById(id)
+
   if (!labTest) {
     throw notFound()
   }
 
-  // if (expand.includes('c')) {
-  // 	await consultantVisit.populate({
-  // 		path: 'prescription',
-  // 		select: 'name',
-  // 		strictPopulate: false,
-  // 	});
-  // }
+  if (expand.includes('prescription')) {
+    await labTest.populate({
+      path: 'prescription',
+      strictPopulate: false,
+      populate: { path: 'medicines' }
+    })
+  }
+  if (expand.includes('consultant-visit')) {
+    await labTest.populate({
+      path: 'consultant_visit_id',
+      strictPopulate: false
+    })
+  }
 
   return {
     ...labTest._doc,

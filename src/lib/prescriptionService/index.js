@@ -1,4 +1,9 @@
-const { Prescription, Medicine, ConsultantVisit } = require('../../model')
+const {
+  Prescription,
+  Medicine,
+  ConsultantVisit,
+  GeneralCondition
+} = require('../../model')
 const defaults = require('../../config/defaults')
 const { notFound } = require('../../utils/error')
 const findModelAddId = require('../../utils/findModelAndAddId')
@@ -35,10 +40,25 @@ const create = async ({
   advice,
   nextdate,
   consultant_visit_id,
+  general_condition,
   user
 }) => {
-  console.log(diagnosis, advice, nextdate, consultant_visit_id)
-  if (!diagnosis || !advice || !nextdate || !consultant_visit_id || !user) {
+  console.log(
+    diagnosis,
+    advice,
+    nextdate,
+    consultant_visit_id,
+    general_condition,
+    user
+  )
+  if (
+    !diagnosis ||
+    !advice ||
+    !nextdate ||
+    !consultant_visit_id ||
+    !general_condition ||
+    !user
+  ) {
     const error = new Error('Invalid parameters')
     error.status = 400
     throw error
@@ -48,6 +68,7 @@ const create = async ({
     diagnosis,
     advice,
     nextdate,
+    general_condition,
     consultant_visit_id,
     user
   })
@@ -61,6 +82,13 @@ const create = async ({
     prescription.id
   )
 
+  await findModelAddId(
+    GeneralCondition,
+    general_condition,
+    'prescription',
+    prescription.id
+  )
+
   return {
     ...prescription._doc,
     id: prescription.id
@@ -69,7 +97,7 @@ const create = async ({
 
 const findSingleItem = async ({ id, expand = '' }) => {
   if (!id) throw new Error('Id is required')
-  console.log(expand)
+
   expand = expand.split(',').map(item => item.trim())
 
   const prescription = await Prescription.findById(id)
@@ -88,6 +116,13 @@ const findSingleItem = async ({ id, expand = '' }) => {
   if (expand.includes('lab-test')) {
     await prescription.populate({
       path: 'labtests',
+      strictPopulate: false
+    })
+  }
+
+  if (expand.includes('general-condition')) {
+    await prescription.populate({
+      path: 'general_condition',
       strictPopulate: false
     })
   }

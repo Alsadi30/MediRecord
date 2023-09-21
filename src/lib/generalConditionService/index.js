@@ -6,14 +6,18 @@ const findAll = async ({
   page = defaults.page,
   limit = defaults.limit,
   search = defaults.search,
-  searchBy = defaults.searchBy
+  searchBy = defaults.searchBy,
+  user
 }) => {
   const filter = {
-    [searchBy]: { $regex: search, $options: 'i' }
+    [searchBy]: { $regex: search, $options: 'i' },
+    user
   }
 
-  const generalConditions = await GeneralCondition.find(search ? filter : {})
-    // .populate({ path: 'consultant', select: 'name' })
+  const generalConditions = await GeneralCondition.find(
+    search ? filter : { user }
+  )
+    .populate({ path: 'consultant_visit_id', select: 'consultant_name' })
     .skip(page * limit - limit)
     .limit(limit)
 
@@ -30,17 +34,9 @@ const create = async ({
   pulse,
   weight,
   age,
-  body_condition
+  body_condition,
+  user
 }) => {
-  console.log(
-    sign_symptom,
-    consultant_visit_id,
-    BP,
-    pulse,
-    weight,
-    age,
-    body_condition
-  )
   if (
     !sign_symptom ||
     !consultant_visit_id ||
@@ -48,7 +44,8 @@ const create = async ({
     !pulse ||
     !weight ||
     !age ||
-    !body_condition
+    !body_condition ||
+    !user
   ) {
     const error = new Error('Invalid parameters')
     error.status = 400
@@ -62,7 +59,8 @@ const create = async ({
     pulse,
     weight,
     age,
-    body_condition
+    body_condition,
+    user
   })
 
   await generalCondition.save()
@@ -77,18 +75,22 @@ const findSingleItem = async ({ id, expand = '' }) => {
 
   expand = expand.split(',').map(item => item.trim())
 
-  const generalCondition = await GeneralCondition.findById(id)
+  const generalCondition = await GeneralCondition.findById(id).populate({
+    path: 'consultant_visit_id',
+    select: 'consultant_name'
+  })
+
   if (!generalCondition) {
     throw notFound()
   }
 
-  // if (expand.includes('c')) {
-  // 	await consultantVisit.populate({
-  // 		path: 'prescription',
-  // 		select: 'name',
-  // 		strictPopulate: false,
-  // 	});
-  // }
+  if (expand.includes('prescription')) {
+    await generalCondition.populate({
+      path: 'prescription',
+      strictPopulate: false,
+      populate: { path: 'medicines' }
+    })
+  }
 
   return {
     ...generalCondition._doc,
@@ -138,5 +140,4 @@ module.exports = {
   findSingleItem,
   updateProperties,
   removeItem
-  // checkOwnership,
 }

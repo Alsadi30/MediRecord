@@ -1,6 +1,6 @@
-const { Medicine } = require('../../../../model')
+const { User } = require('../../../../model')
 const count = require('../../../../utils/count')
-const medicineService = require('../../../../lib/medicineService')
+const userService = require('../../../../lib/user')
 const { query } = require('../../../../utils')
 const defaults = require('../../../../config/defaults')
 
@@ -9,31 +9,20 @@ const findAllItems = async (req, res, next) => {
   const limit = req.query.limit || defaults.limit
   const search = req.query.search || defaults.search
   const searchBy = req.query.searchBy || defaults.searchBy
-  const Model = Medicine
-  const user = req.user.id
+  const Model = User
   try {
     // data
-    const medicine = await medicineService.findAll({
+    const consultant = await userService.findAll({
       page,
       limit,
       search,
-      searchBy,
-      Model,
-      user
+      searchBy
     })
 
     const data = query.getTransformedItems({
-      items: medicine,
-      path: '/medicine',
-      selection: [
-        'id',
-        'medicine_name',
-        'dose',
-        'duration',
-        'prescription',
-        'updatedAt',
-        'createdAt'
-      ]
+      items: consultant,
+      path: '/consultant',
+      selection: ['id', 'name', 'email', 'phone', 'updatedAt', 'createdAt']
     })
 
     // pagination

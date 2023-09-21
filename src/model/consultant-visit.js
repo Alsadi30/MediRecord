@@ -16,6 +16,10 @@ const consultantVisitSchema = new Schema(
       type: Schema.ObjectId,
       ref: 'Prescription'
     },
+    user: {
+      type: Schema.ObjectId,
+      ref: 'User'
+    },
     visit_no: {
       type: Number,
       maxLength: 4,

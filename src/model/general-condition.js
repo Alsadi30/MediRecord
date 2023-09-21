@@ -26,6 +26,10 @@ const generalConditionSchema = new Schema(
       type: Schema.ObjectId,
       ref: 'ConsultantVisit'
     },
+    user: {
+      type: Schema.ObjectId,
+      ref: 'User'
+    },
     prescription: {
       type: Schema.ObjectId,
       ref: 'Prescription'

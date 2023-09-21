@@ -11,7 +11,8 @@ const create = async (req, res, next) => {
     date,
     test_type
   } = req.body
-  console.log(req.body)
+  const user = req.user.id
+
   try {
     const labTest = await labTestService.create({
       test_name,
@@ -21,7 +22,8 @@ const create = async (req, res, next) => {
       prescription,
       comment,
       date,
-      test_type
+      test_type,
+      user
     })
 
     const response = {

@@ -20,13 +20,20 @@ const lab_testSchema = new Schema(
       minLength: 4,
       required: true
     },
-    consultant: {
+    consultant_visit_id: {
+      type: Schema.ObjectId,
+      ref: 'ConsultantVisit'
+    },
+    user: {
       type: Schema.ObjectId,
       ref: 'User'
     },
+    prescription: {
+      type: Schema.ObjectId,
+      ref: 'Prescription'
+    },
     comment: {
       type: String,
-      unique: true,
       required: true
     },
     date: {

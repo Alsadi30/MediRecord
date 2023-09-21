@@ -6,13 +6,17 @@ const findAll = async ({
   page = defaults.page,
   limit = defaults.limit,
   search = defaults.search,
-  searchBy = defaults.searchBy
+  searchBy = defaults.searchBy,
+  user
 }) => {
   const filter = {
-    [searchBy]: { $regex: search, $options: 'i' }
+    [searchBy]: { $regex: search, $options: 'i' },
+    user
   }
 
-  const consultantVisits = await ConsultantVisit.find(search ? filter : {})
+  const consultantVisits = await ConsultantVisit.find(
+    search ? filter : { user }
+  )
     .populate({ path: 'consultant', select: 'name' })
     .skip(page * limit - limit)
     .limit(limit)
@@ -23,8 +27,14 @@ const findAll = async ({
   }))
 }
 
-const create = async ({ consultant_name, consultant, visit_no, date }) => {
-  if (!consultant_name || !consultant || !visit_no || !date) {
+const create = async ({
+  consultant_name,
+  consultant,
+  visit_no,
+  date,
+  user
+}) => {
+  if (!consultant_name || !consultant || !visit_no || !date || !user) {
     const error = new Error('Invalid parameters')
     error.status = 400
     throw error
@@ -34,7 +44,8 @@ const create = async ({ consultant_name, consultant, visit_no, date }) => {
     consultant_name,
     consultant,
     visit_no,
-    date
+    date,
+    user
   })
 
   await consultantvisit.save()
@@ -54,13 +65,13 @@ const findSingleItem = async ({ id, expand = '' }) => {
     throw notFound()
   }
 
-  // if (expand.includes('c')) {
-  // 	await consultantVisit.populate({
-  // 		path: 'prescription',
-  // 		select: 'name',
-  // 		strictPopulate: false,
-  // 	});
-  // }
+  if (expand.includes('prescription')) {
+    await consultantVisit.populate({
+      path: 'prescription',
+      strictPopulate: false,
+      populate: { path: 'medicines' }
+    })
+  }
 
   return {
     ...consultantVisit._doc,
@@ -102,5 +113,4 @@ module.exports = {
   findSingleItem,
   updateProperties,
   removeItem
-  // checkOwnership,
 }
