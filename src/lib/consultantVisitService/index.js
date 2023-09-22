@@ -17,7 +17,6 @@ const findAll = async ({
   const consultantVisits = await ConsultantVisit.find(
     search ? filter : { user }
   )
-    .populate({ path: 'consultant', select: 'name' })
     .skip(page * limit - limit)
     .limit(limit)
 
