@@ -18,7 +18,6 @@ const findAllItems = async (req, res, next) => {
       limit,
       search,
       searchBy,
-      Model,
       user
     })
 

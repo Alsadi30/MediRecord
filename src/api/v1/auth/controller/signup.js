@@ -26,7 +26,7 @@ const signup = async (req, res, next) => {
     // response
     const response = {
       code: 201,
-      message: 'Signup successful',
+      message: 'Signup Successful',
       data: {
         access_token: accessToken
       },
