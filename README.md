@@ -4,98 +4,84 @@
 
 This project is a comprehensive healthcare management system API designed to streamline medical records and facilitate patient care. It provides a robust set of endpoints for managing patient data, consultations, prescriptions, lab tests, and medications. The API allows patients and healthcare providers to efficiently track patient history, treatments, and appointments, enhancing the quality of care and patient outcomes.
 
-**Key Features:**
+## Key Features
 
-1. **Consultation Management:**
-   - Create, retrieve, update, and delete patient consultation records.
-   - Track consultation details such as consultant name, visit number, date, and related timestamps.
+- **Consultation Management:**
+  - Create, retrieve, update, and delete patient consultation records.
+  - Track consultation details such as consultant name, visit number, date, and related timestamps.
 
-2. **General Condition Tracking:**
-   - Record and manage patient general condition data.
-   - Capture vital signs like blood pressure, pulse, weight, and age.
-   - Monitor general health status and body condition.
+- **General Condition Tracking:**
+  - Record and manage patient general condition data.
+  - Capture vital signs like blood pressure, pulse, weight, and age.
+  - Monitor general health status and body condition.
 
-3. **Lab Test Management:**
-   - Easily manage patient lab test records.
-   - Record test names, results, normal values, comments, and test types (routine or typical).
-   - Organize and retrieve lab test data efficiently.
+- **Lab Test Management:**
+  - Easily manage patient lab test records.
+  - Record test names, results, normal values, comments, and test types (routine or typical).
+  - Organize and retrieve lab test data efficiently.
 
-4. **Prescription Handling:**
-   - Create, retrieve, update, and delete patient prescriptions.
-   - Include diagnosis, consultant visit ID, general condition, advice, and next appointment date.
-   - Keep a record of prescription creation and modification timestamps.
+- **Prescription Handling:**
+  - Create, retrieve, update, and delete patient prescriptions.
+  - Include diagnosis, consultant visit ID, general condition, advice, and next appointment date.
+  - Keep a record of prescription creation and modification timestamps.
 
-5. **Medication Management:**
-   - Manage patient medication information.
-   - Record dosage, duration, and link prescriptions for medication.
-   - Efficiently organize and access medication data.
+- **Medication Management:**
+  - Manage patient medication information.
+  - Record dosage, duration, and link prescriptions for medication.
+  - Efficiently organize and access medication data.
 
-6. **Pagination Support:**
-   - Implement pagination for large datasets.
-   - Control the number of items returned per page and navigate through result pages.
+- **Pagination Support:**
+  - Implement pagination for large datasets.
+  - Control the number of items returned per page and navigate through result pages.
 
-7. **Error Handling:**
-   - Handle various types of errors gracefully, including bad requests, unauthorized access, resource not found, and internal server errors.
+- **Error Handling:**
+  - Handle various types of errors gracefully, including bad requests, unauthorized access, resource not found, and internal server errors.
 
-This API is designed to enhance healthcare providers' ability to manage patient records and treatments efficiently. It offers a secure and structured approach to healthcare data management, ensuring that patient information remains confidential and accessible only to authorized personnel. With its user-friendly endpoints, it simplifies the process of recording and accessing critical medical data, ultimately contributing to improved patient care and medical decision-making.
+## Installation Steps
 
+1. Clone the repository and navigate to the project directory:
 
-## Installation
+    ```bash
+    git clone https://github.com/Alsadi30/MediRecord
+    cd MediRecord
+    ```
 
-1. Clone the repository:
+2. Install dependencies:
 
-   ```bash
-   git clone https://github.com/Alsadi30/medirecord.git
+    ```bash
+    npm install
+    ```
 
+3. Set up environment variables:
 
-Certainly, here's the complete README file in one markdown block for your GitHub repository:
+    - Create a `.env` file in the project root.
 
-markdown
-Copy code
-# MediRecord
+    - Add the following environment variables to the `.env` file:
 
-MediRecord is a personal medical application designed to track and maintain a person's medical and health-related data. This application aims to cater to the needs of individuals, whether they are managing existing health conditions or simply maintaining their health records. With MediRecord, users can store and organize their general information, physical health status, consultation history, medical test results, medications, routine tests, and expert advice.
+        ```plaintext
+        DB_CONNECTION_URL=mongodb+srv://<DB_USERNAME>:<DB_PASSWORD>@your.mongodb.net/
+        DB_USERNAME=<username>
+        DB_PASSWORD=<dbpassword>
+        ACCESS_TOKEN_SECRET=<SECRET>
+        ```
 
-## Features
+4. Start the application:
 
-- **User Authentication**: Secure user registration and authentication using JWT (JSON Web Tokens).
-- **Consultation History**: Record and track visits to medical consultants, including consultant information.
-- **Medical Test Records**: Store and manage results from medical tests, linking them to the relevant consultations.
-- **Medication Tracking**: Keep records of prescribed medications, dosages, and schedules.
-- **Health Status Monitoring**: Record and update physical health status over time.
-- **Expert Advice**: Store and access advice provided by medical consultants.
-- **Data Organization**: All information is logically organized, making it easy to access and understand.
+    ```bash
+    npm run dev
+    ```
 
-## Installation
+## Usage
 
-1. Clone the repository:
+Access the API documentation using [Swagger UI](http://localhost:8000/docs) in your web browser while the application is running.
 
-   ```bash
-   git clone https://github.com/yourusername/medirecord.git
-   
-Install dependencies:   
-cd medirecord
-npm install
+## API Documentation
 
-Set up environment variables:
-
-Create a .env file in the project root and add the following environment variables:
-DB_CONNECTION_URL=mongodb+srv://<username>:<password>@*********r.mongodb.net/
-DB_USERNAME= username
-DB_PASSWORD= dbpassword
-ACCESS_TOKEN_SECRET=  SECRET
-
-Start the application:
-npm run dev
-
-Usage
-Access the API documentation using Swagger UI by visiting Swagger UI in your web browser while the application is running.
-API Documentation
 You can find detailed documentation for the API endpoints below. This API follows the OpenAPI specification.
 
-API Endpoints
+## API Endpoints
 
-## Consultant Visit
+### Consultant Visit
 
 ### Get all Consultant Visits
 
@@ -487,11 +473,7 @@ API Endpoints
   - `500`: Internal Server Error.
 
 
-**Accessing API Documentation**
-
-To access the API documentation, visit Swagger UI in your web browser while the application is running.
-
-**Technologies Used**
+## Technologies Used
 
 - **Express.js:** A fast, unopinionated web framework for Node.js.
 - **Mongoose:** An ODM (Object Data Modeling) library for MongoDB and Node.js.
@@ -501,11 +483,11 @@ To access the API documentation, visit Swagger UI in your web browser while the 
 - **Swagger UI Express:** Middleware for serving Swagger UI for API documentation.
 - Other dependencies for routing, logging, and environment configuration.
 
-**License**
+## License
 
 This project is licensed under the ISC License.
 
-**Contact**
+## Contact
 
 - Author: Sadi
 - Email: your.email@example.com
