@@ -3,13 +3,27 @@ const { badRequest } = require('../../utils/error')
 const { generateHash, hashMatched } = require('../../utils/hashing')
 const { generateToken } = require('../token')
 
+/**
+ * Creates a new user account and returns the user object.
+ *
+ * @param {object} params - User signup parameters.
+ * @throws {Error} If the user already exists or if there's an issue with user creation.
+ * @returns {object} The created user object.
+ */
+
 const signup = async ({ name, email, phone, birthdate, role, password }) => {
+  // Check if a user with the same email already exists
   const hasUser = await userExist(email)
+
+  // If a user with the same email exists, throw an error
   if (hasUser) {
     throw badRequest('User already exist')
   }
 
+  // Generate a hashed password for the new user
   password = await generateHash(password)
+
+  // Create a new user with the provided information
   const user = await createUser({
     name,
     email,
@@ -19,6 +33,7 @@ const signup = async ({ name, email, phone, birthdate, role, password }) => {
     password
   })
 
+  // Return the created user object
   return user
 }
 
